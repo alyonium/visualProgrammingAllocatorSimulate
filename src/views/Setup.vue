@@ -94,6 +94,7 @@ export default {
       runTimeFrom: 5000,
       runTimeTo: 10000,
     });
+
     const onSubmit = () => {
       store.commit('setMemoryLimit', formState.memoryLimit);
       store.commit('setQueueTasks',
@@ -110,6 +111,7 @@ export default {
 
       router.push('/simulate');
     };
+
     return {
       formState,
       onSubmit,
