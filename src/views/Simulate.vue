@@ -11,14 +11,7 @@
               <th>Время начала</th>
               <th>Длительность</th>
             </tr>
-            <tr v-for="task in store.state.queueTasks" :key="task.name">
-              <td>
-                {{ task.name }}
-              </td>
-              <td> {{ task.size }}</td>
-              <td>{{ task.maxWaitTime }}</td>
-              <td>{{ task.runTime }}</td>
-            </tr>
+            <QAbstractListModel :renderer-class="instanse" :data="store.state.queueTasks"/>
           </table>
           <div v-else class="empty">
             Пусто
@@ -39,14 +32,7 @@
               <th>Время начала</th>
               <th>Длительность</th>
             </tr>
-            <tr v-for="task in store.state.currentTasks" :key="task.name">
-              <td>
-                {{ task.name }}
-              </td>
-              <td> {{ task.size }}</td>
-              <td>{{ task.maxWaitTime }}</td>
-              <td>{{ task.runTime }}</td>
-            </tr>
+            <QAbstractListModel :renderer-class="instanse" :data="store.state.currentTasks"/>
           </table>
           <div v-else class="empty">
             Пусто
@@ -64,14 +50,7 @@
               <th>Время начала</th>
               <th>Длительность</th>
             </tr>
-            <tr v-for="task in store.state.doneTasks" :key="task.name">
-              <td>
-                {{ task.name }}
-              </td>
-              <td> {{ task.size }}</td>
-              <td>{{ task.maxWaitTime }}</td>
-              <td>{{ task.runTime }}</td>
-            </tr>
+            <QAbstractListModel :renderer-class="instanse" :data="store.state.doneTasks"/>
           </table>
           <div v-else class="empty">
             Пусто
@@ -89,14 +68,7 @@
               <th>Время начала</th>
               <th>Длительность</th>
             </tr>
-            <tr v-for="task in store.state.lostTasks" :key="task.name">
-              <td>
-                {{ task.name }}
-              </td>
-              <td> {{ task.size }}</td>
-              <td>{{ task.maxWaitTime }}</td>
-              <td>{{ task.runTime }}</td>
-            </tr>
+            <QAbstractListModel :renderer-class="instanse" :data="store.state.lostTasks"/>
           </table>
           <div v-else class="empty">
             Пусто
@@ -108,12 +80,37 @@
 </template>
 
 <script>
-
 import { useStore } from 'vuex';
 import { onMounted } from 'vue';
+import QAbstractListModel from '@/components/QAbstractListModel.vue';
+
+class TextGetter {
+  constructor(func) {
+    this.innerFunc = func;
+  }
+
+  getText(el) {
+    const res = this.innerFunc(el);
+
+    return res;
+  }
+}
+
+class DataMapper {
+  constructor(store, mapper) {
+    this.data = mapper(store);
+  }
+
+  makeData() {
+    return this.data;
+  }
+}
 
 export default {
   name: 'Simulate',
+  components: {
+    QAbstractListModel,
+  },
   setup() {
     const store = useStore();
 
@@ -171,8 +168,18 @@ export default {
     onMounted(setLostTimers);
     onMounted(updateMemory);
 
+    const getText = (el) => el;
+
+    const instanse = new TextGetter(getText);
+
+    const mapData = (savedStore) => savedStore.state.lostTasks;
+
+    const data = new DataMapper(store, mapData);
+
     return {
       store,
+      instanse,
+      data,
     };
   },
 };
